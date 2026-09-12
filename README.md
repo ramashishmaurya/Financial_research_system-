@@ -1,78 +1,104 @@
-# 🤖 Agentic-Research-Engine
+# Agentic Financial Research Engine
 
-## 📊 Project Flow (Architecture Diagram)
+A production-ready, asynchronous multi-agent AI system designed to generate comprehensive financial research reports. It leverages the power of LangGraph for orchestrating specialized AI agents, Celery and Redis for asynchronous background processing, and FastAPI for robust API routing.
 
-Yeh is project ka visual flow hai ki user ki request se lekar final report banne tak data kaise travel karega.
+## 🚀 Features
+
+- **Multi-Agent Architecture (LangGraph):** Employs a relay-race methodology across four specialized AI agents:
+  - `Search Agent`: Fetches real-time market data and news using the Tavily Search API.
+  - `Analyst Agent`: Derives market sentiment (Bullish/Bearish) and extracts key insights.
+  - `Risk Agent`: Identifies critical investment risks and red flags.
+  - `Editor Agent`: Synthesizes data into a professional, cohesive Markdown report.
+- **Asynchronous Processing:** Powered by **Celery** and **Redis**. API endpoints return instantly (yielding a `job_id`), preventing browser timeouts while intensive AI tasks run in the background.
+- **Web Dashboard View:** Real-time polling updates the UI gracefully, rendering the final Markdown report directly into a beautifully styled HTML dashboard via `marked.js` with zero forced PDF downloads.
+- **Persistent Storage:** Uses **SQLite** (via SQLAlchemy) to track job queues, timestamps, and store raw report content. Easily scalable to PostgreSQL.
+- **Token Optimized:** Custom agent constraints ensure the system remains well within strict LLM API output token limits (e.g., Groq's Free Tier).
+
+## 🏗️ System Architecture
 
 ```mermaid
-graph TD
-    %% Colors and Styles
-    classDef user fill:#3498db,stroke:#2980b9,stroke-width:2px,color:white;
-    classDef api fill:#2ecc71,stroke:#27ae60,stroke-width:2px,color:white;
-    classDef queue fill:#f39c12,stroke:#d35400,stroke-width:2px,color:white;
-    classDef agent fill:#9b59b6,stroke:#8e44ad,stroke-width:2px,color:white;
-    classDef db fill:#34495e,stroke:#2c3e50,stroke-width:2px,color:white;
-
-    %% Nodes
-    User(("👨‍💻 User / Frontend")):::user
-    FastAPI["⚡ FastAPI Server"]:::api
-    Redis[("🔄 Redis Queue")]:::queue
-    Celery["⚙️ Background Worker"]:::queue
-    
-    subgraph MultiAgentSystem ["🧠 Multi-Agent AI System"]
-        Orchestrator["Boss Agent / Orchestrator"]:::agent
-        SearchAgent["🔍 Web Search Agent"]:::agent
-        AnalystAgent["📈 Data Analyst Agent"]:::agent
-        RiskAgent["⚠️ Risk Assessor Agent"]:::agent
-        EditorAgent["✍️ Report Editor Agent"]:::agent
-    end
-    
-    DB[("🗄️ PostgreSQL DB")]:::db
-    S3[("☁️ AWS S3 Storage")]:::db
-
-    %% User Interaction
-    User -- "1. Request (e.g. 'Tata Motors')" --> FastAPI
-    FastAPI -- "2. Return Job ID (Turant)" --> User
-    
-    %% Backend Flow
-    FastAPI -- "3. Save Status (Pending)" --> DB
-    FastAPI -- "4. Send Task" --> Redis
-    Redis -- "5. Pick up Task" --> Celery
-    
-    %% AI Flow
-    Celery -- "6. Start Workflow" --> Orchestrator
-    
-    Orchestrator --> SearchAgent
-    SearchAgent -- "Raw Data" --> Orchestrator
-    
-    Orchestrator --> AnalystAgent
-    AnalystAgent -- "Analysis" --> Orchestrator
-    
-    Orchestrator --> RiskAgent
-    RiskAgent -- "Risk Info" --> Orchestrator
-    
-    Orchestrator --> EditorAgent
-    EditorAgent -- "Final Markdown/PDF" --> Orchestrator
-    
-    %% Save & Delivery
-    Orchestrator -- "7. Upload Report" --> S3
-    Celery -- "8. Mark Completed" --> DB
-    
-    User -- "9. Check Job Status" --> FastAPI
-    FastAPI -- "Give S3 Download Link" --> User
+graph LR
+    A[Client UI] -->|POST /research| B(FastAPI Server)
+    B -->|Returns job_id| A
+    B -->|Enqueues Task| C((Redis Broker))
+    D[Celery Worker] -->|Pulls Task| C
+    D -->|Executes| E[LangGraph Multi-Agent Pipeline]
+    E <--> F[(SQLite Database)]
+    A -->|GET /status/{job_id}| B
+    B -->|Reads Status/Report| F
 ```
 
-## 🛠️ Tech Stack & Tools (100% Free Tier)
-- **Backend Core**: FastAPI (Python)
-- **AI Brain**: Gemini API / Groq
-- **Multi-Agent Framework**: LangGraph ya CrewAI
-- **Background Tasks**: Celery + Redis
-- **Database**: PostgreSQL (via SQLAlchemy)
-- **Cloud Storage**: AWS S3
+## 📋 Prerequisites
 
-## 📝 Step-by-Step Execution Plan (Kaise Banayenge?)
-1. **Level 1:** Ek simple FastAPI server setup karna.
-2. **Level 2:** LLM (Gemini) ko API se connect karna.
-3. **Level 3:** Ek single agent banana jo web search kar sake.
-4. **Level 4:** Baaki agents banana aur unhe aapas mein connect karna.
-5. **Level 5:** Redis/Celery add karna taaki background mein kaam ho sake.
+Before you begin, ensure you have the following installed:
+- Python 3.10+
+- Redis Server (Must be running locally or via Docker)
+- API Keys: [Groq](https://console.groq.com/) (LLM), [Tavily](https://tavily.com/) (Search)
+
+## 🛠️ Installation & Setup
+
+1. **Clone the repository:**
+   ```bash
+   git clone https://github.com/yourusername/financial-research-system.git
+   cd financial-research-system
+   ```
+
+2. **Set up a virtual environment (Optional but recommended):**
+   ```bash
+   python -m venv venv
+   source venv/bin/activate  # On Windows: venv\Scripts\activate
+   ```
+
+3. **Install dependencies:**
+   ```bash
+   pip install -r requirements.txt
+   ```
+
+4. **Configure Environment Variables:**
+   Create a `.env` file in the root directory and add your credentials:
+   ```env
+   # API Keys
+   GROQ_API_KEY=your_groq_api_key_here
+   TAVILY_API_KEY=your_tavily_api_key_here
+
+   # Database (SQLite for local testing)
+   DATABASE_URL=sqlite:///./research_engine.db
+
+   # Redis Configuration
+   REDIS_URL=redis://localhost:6379/0
+   ```
+
+## 🚦 Running the Application
+
+This architecture requires two separate terminals to run the API and the background worker simultaneously.
+
+**Terminal 1: Start the FastAPI Server**
+```bash
+uvicorn backend.main:app --reload
+```
+*The API will be available at `http://127.0.0.1:8000`. You can view the Swagger UI at `/docs`.*
+
+**Terminal 2: Start the Celery Worker**
+```bash
+# On Windows (using solo pool):
+celery -A worker.celery_app worker -l info -P solo
+
+# On Linux/Mac:
+celery -A worker.celery_app worker -l info
+```
+
+**Terminal 3: Launch the Frontend**
+You can serve the frontend folder using any simple HTTP server.
+```bash
+cd frontend
+python -m http.server 3000
+```
+*Open `http://localhost:3000` in your web browser to access the dashboard.*
+
+## 🛣️ Future Scope
+- **User Authentication:** Integrate JWT-based login (Schema is already prepared in `auth_table.py`).
+- **AWS S3 Integration:** Offload old reports to S3 cold storage for database cost optimization.
+- **Chart Generation:** Enable AI to generate matplotlib graphics and embed them via S3 URLs into the dashboard.
+
+## 📄 License
+MIT License.
