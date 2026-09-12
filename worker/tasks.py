@@ -1,0 +1,56 @@
+import time
+import sys
+import os
+from datetime import datetime
+
+# Include the parent directory so we can import the backend package
+sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
+
+from worker.celery_app import celery_app
+from backend.database import SessionLocal
+from backend.models.jobs_table import Job, JobStatus
+
+@celery_app.task(bind=True)
+def generate_research_report(self, job_id: str, company_name: str):
+    """
+    Background worker that runs the Multi-Agent AI System.
+    For Phase 2, this simulates the workload with a sleep delay.
+    """
+    db = SessionLocal()
+    try:
+        # 1. Update job status to PROCESSING
+        job = db.query(Job).filter(Job.id == job_id).first()
+        if not job:
+            return f"Error: Job {job_id} not found in database."
+        
+        job.status = JobStatus.PROCESSING
+        db.commit()
+
+        print(f"[AI WORKER] Started analyzing: {company_name}")
+
+        # 2. RUN MULTI-AGENT AI SYSTEM (LangGraph)
+        from ai_agents.orchestrator import run_research_pipeline
+        final_report = run_research_pipeline(company_name)
+        
+        print(f"[AI WORKER] Finished analyzing: {company_name}. Generating PDF...")
+
+        # 3. Mark job as COMPLETED and set mock S3 URL
+        job.status = JobStatus.COMPLETED
+        job.completed_at = datetime.utcnow()
+        
+        # Save the raw Markdown report directly into the database for frontend rendering
+        job.report_content = final_report
+        db.commit()
+        
+        return f"Successfully processed report for {company_name}"
+    
+    except Exception as e:
+        db.rollback()
+        # Mark as FAILED if something crashes
+        job = db.query(Job).filter(Job.id == job_id).first()
+        if job:
+            job.status = JobStatus.FAILED
+            db.commit()
+        return f"Failed: {str(e)}"
+    finally:
+        db.close()

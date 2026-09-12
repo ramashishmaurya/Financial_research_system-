@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Agentic Research Engine</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="background-elements">
+        <div class="glow-orb orb-1"></div>
+        <div class="glow-orb orb-2"></div>
+    </div>
+
+    <div class="container">
+        <header>
+            <h1>Agentic <span>Research</span></h1>
+            <p>AI-powered market analysis at your fingertips.</p>
+        </header>
+
+        <main class="glass-panel">
+            <form id="researchForm">
+                <div class="input-group">
+                    <input type="text" id="companyInput" placeholder="Enter company name (e.g., Tata Motors)" required autocomplete="off">
+                    <button type="submit" id="searchBtn">
+                        <span class="btn-text">Generate Report</span>
+                        <div class="loader-spinner hidden" id="btnSpinner"></div>
+                    </button>
+                </div>
+            </form>
+
+            <div id="statusContainer" class="status-container hidden">
+                <div class="status-indicator">
+                    <div class="pulse-ring"></div>
+                    <span id="statusText">Processing...</span>
+                </div>
+                <div class="progress-bar-container">
+                    <div class="progress-bar" id="progressBar"></div>
+                </div>
+                <p id="jobIdText" class="job-id-text">Job ID: <span id="jobId"></span></p>
+            </div>
+
+            <!-- Dashboard View (Where Report Renders) -->
+            <div id="reportDashboard" class="hidden dashboard-container">
+                <h2 class="dashboard-title">Final Report</h2>
+                <div id="markdownContent" class="markdown-content">
+                    <!-- Markdown will render here -->
+                </div>
+                
+                <div id="resultAction" class="hidden">
+                    <button onclick="window.print()" class="btn-primary" style="margin-top: 20px; width: 100%;">
+                        Print / Save as PDF
+                    </button>
+                </div>
+            </div>
+        </main>
+        
+        <footer>
+            <p>Powered by FastAPI, Celery, and LangGraph.</p>
+        </footer>
+    </div>
+
+    <!-- Marked.js for Markdown Parsing -->
+    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+    <script src="app.js"></script>
+</body>
+</html>

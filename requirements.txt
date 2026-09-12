@@ -1,0 +1,41 @@
+# ==========================================
+# 🚀 Backend Core (FastAPI & Server)
+# ==========================================
+fastapi
+uvicorn[standard]
+python-dotenv
+
+# ==========================================
+# 🗄️ Database & ORM (PostgreSQL + SQLAlchemy)
+# ==========================================
+sqlalchemy
+asyncpg
+psycopg2-binary
+alembic
+
+# ==========================================
+# 🔐 Authentication & Security
+# ==========================================
+passlib[bcrypt]
+python-jose[cryptography]
+
+# ==========================================
+# ⚙️ Asynchronous Task Queue (Celery + Redis)
+# ==========================================
+celery
+redis
+
+# ==========================================
+# 🧠 AI Brain & Agents (LangGraph + Groq)
+# ==========================================
+langchain
+langchain-groq
+langgraph
+tavily-python   # For web scraping/search agent tool (Optional but very useful)
+
+# ==========================================
+# ☁️ Cloud & Storage (AWS) & File Generation
+# ==========================================
+boto3
+markdown
+xhtml2pdf
