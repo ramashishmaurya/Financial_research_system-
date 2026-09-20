@@ -49,7 +49,7 @@ def generate_research_report(self, job_id: str, company_name: str):
                 temp_file.write(final_report)
                 temp_file_path = temp_file.name
             
-            s3_file_name = f"reports/report_{job_id}.md"
+            s3_file_name = f"reports/report_{job_id}.md"  
             print(f"[AI WORKER] Uploading to S3 as {s3_file_name}...")
             
             s3_url = upload_to_s3(temp_file_path, s3_file_name)

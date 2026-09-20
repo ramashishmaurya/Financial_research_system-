@@ -30,7 +30,7 @@ graph TD
     end
     
     DB[("🗄️ SQLite / PostgreSQL DB")]:::db
-    S3[("☁️ AWS S3 Storage (Upcoming)")]:::db
+    S3[("☁️ AWS S3 Storage ")]:::db
 
     %% User Interaction
     User -- "1. Request (e.g. 'Tata Motors')" --> FastAPI

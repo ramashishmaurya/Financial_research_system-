@@ -7,5 +7,28 @@ services:
       - "6379:6379"
     restart: always
 
-# Hum abhi PostgreSQL use nahi kar rahe kyunki default SQLite pe chal raha hai.
-# Jab AWS RDS pe jayenge tab Postgres add kar denge.
+  api:
+    build: .
+    ports:
+      - "8000:8000"
+    command: uvicorn backend.main:app --host 0.0.0.0 --port 8000 --reload
+    env_file:
+      - .env
+    depends_on:
+      - redis
+    restart: always
+
+  worker:
+    build: .
+    command: celery -A worker.celery_app worker -l info
+    env_file:
+      - .env
+    depends_on:
+      - redis
+    restart: always
+
+  frontend:
+    build: ./frontend
+    ports:
+      - "3000:80"
+    restart: always

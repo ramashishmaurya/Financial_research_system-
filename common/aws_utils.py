@@ -11,17 +11,18 @@ def get_s3_client():
         region_name=os.getenv('AWS_REGION', 'us-east-1')
     )
 
+
 def upload_to_s3(file_path: str, s3_file_name: str) -> str:
     """
     Uploads a file to AWS S3 and returns the public URL.
     """
-    bucket_name = os.getenv('AWS_S3_BUCKET_NAME')
+    bucket_name = os.getenv('AWS_S3_BUCKET_NAME') 
     
     if not bucket_name:
         print("AWS_S3_BUCKET_NAME is not set in environment variables.")
         return None
 
-    s3_client = get_s3_client()
+    s3_client = get_s3_client() 
     
     try:
         # Upload the file
@@ -41,3 +42,5 @@ def upload_to_s3(file_path: str, s3_file_name: str) -> str:
     except ClientError as e:
         print(f"Error uploading to S3: {e}")
         return None
+
+
