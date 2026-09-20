@@ -1,11 +1,21 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
-from backend.database import engine, Base
+from backend import engine, Base
 from backend.models import auth_table, jobs_table
 from backend.routes import research_routes
 
 # Create the database tables if they don't exist
 Base.metadata.create_all(bind=engine)
+
+# Automatically insert a mock user for testing so we don't get Foreign Key errors
+from backend.database import SessionLocal
+from backend.models.auth_table import User
+with SessionLocal() as db_session:
+    if not db_session.query(User).filter(User.id == 1).first():
+        mock_user = User(id=1, email="test@example.com", hashed_password="mocked")
+        db_session.add(mock_user)
+        db_session.commit()
+
 
 app = FastAPI(
     title="Multi-Agent Financial Research System",
