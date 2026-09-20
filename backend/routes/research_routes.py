@@ -29,7 +29,8 @@ def start_research(request: ResearchRequest, db: Session = Depends(get_db)):
         job_id=new_job.id,
         company_name=new_job.company_name,
         status=new_job.status,
-        report_content=None
+        report_content=None,
+        report_s3_url=None
     )
 
 @router.get("/status/{job_id}", response_model=JobStatusResponse)
@@ -45,5 +46,6 @@ def get_job_status(job_id: str, db: Session = Depends(get_db)):
         job_id=job.id,
         company_name=job.company_name,
         status=job.status,
-        report_content=job.report_content
+        report_content=job.report_content,
+        report_s3_url=job.report_s3_url
     )

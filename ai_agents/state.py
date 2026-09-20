@@ -8,3 +8,8 @@ class AgentState(TypedDict):
     market_sentiment: str        # Populated by Analyst Agent
     risk_factors: str            # Populated by Risk Agent
     final_report: str            # Populated by Editor Agent
+
+
+
+
+

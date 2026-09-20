@@ -35,6 +35,9 @@ class Job(Base):
     # The generated Markdown report text (populated when completed)
     report_content = Column(String, nullable=True)
     
+    # The AWS S3 URL where the report file is stored
+    report_s3_url = Column(String, nullable=True)
+    
     # Timestamps
     created_at = Column(DateTime, default=datetime.utcnow)
     completed_at = Column(DateTime, nullable=True)

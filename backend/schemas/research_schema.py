@@ -9,3 +9,7 @@ class JobStatusResponse(BaseModel):
     company_name: str
     status: str
     report_content: Optional[str] = None
+    report_s3_url: Optional[str] = None
+
+
+

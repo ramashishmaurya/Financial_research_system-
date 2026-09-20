@@ -54,4 +54,6 @@ def run_research_pipeline(company_name: str) -> str:
     print(f"[Orchestrator] Starting Multi-Agent workflow for: {company_name}")
     final_state = app.invoke(initial_state)
     
-    return final_state["final_report"]
+    return final_state["final_report"] 
+
+
