@@ -71,7 +71,7 @@ graph TD
 - **Background Tasks**: Celery + Redis
 - **Database**: SQLite (Development) / PostgreSQL (Production ready via SQLAlchemy)
 - **Frontend**: HTML5, Vanilla CSS, JS (marked.js)
-- **Cloud Storage**: AWS S3 (Planned for Next Phase)
+- **Cloud Storage**: AWS S3 
 
 ## 🚀 Features
 
